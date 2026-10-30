@@ -308,3 +308,4 @@ When transitioning from the simulation to production:
 2. Add background periodic sync triggers via `workmanager` (Android) or `BackgroundTasks` (iOS).
 3. Enable conflict resolution policies (e.g. Last-Write-Wins based on ISO-8601 timestamps).
 4. Review GDPR / COPPA compliance: ensure all child data is stored with end-to-end encryption or strict family-scoped row-level security.
+
