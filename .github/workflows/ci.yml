@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  analyze-and-test:
+    name: Lint, Analyze & Test
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Block secrets in bundled config
+        shell: pwsh
+        run: |
+          $leaked = Select-String -Path assets/env.defaults -Pattern '^\s*GEMINI_API_KEY\s*=\s*\S+' -Quiet
+          if ($leaked) {
+            throw "assets/env.defaults contains a GEMINI_API_KEY. The app bundles this file, so use --dart-define=GEMINI_API_KEY or the in-app Settings sheet instead."
+          }
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: stable
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Verify Dart Code Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static Code Analysis
+        run: flutter analyze --fatal-infos
+
+      - name: Run Tests
+        run: flutter test --reporter expanded
