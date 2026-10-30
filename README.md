@@ -108,6 +108,33 @@ flutter pub get
 flutter run
 ```
 
+### Run Contributor Checks in Docker
+
+Docker provides the same Flutter version used by CI. Build the image once:
+
+```bash
+docker build -t parentify-dev .
+```
+
+Start a shell with the project mounted (PowerShell):
+
+```powershell
+docker run --rm -it -v "${PWD}:/workspace" -v /workspace/.dart_tool -w /workspace parentify-dev
+```
+
+Then run the usual checks inside the container:
+
+```bash
+flutter pub get
+dart format --output=none --set-exit-if-changed .
+flutter analyze --fatal-infos
+flutter test --reporter expanded
+```
+
+The `.dart_tool` volume keeps Linux-generated package metadata separate from
+your host machine. The container is for checks; use a local Flutter setup to
+launch the app on a device or emulator.
+
 ---
 
 ## Test Accounts & Sign In
